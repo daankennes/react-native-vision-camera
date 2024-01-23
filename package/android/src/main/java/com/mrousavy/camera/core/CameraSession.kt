@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.Dispatchers
 
 class CameraSession(private val context: Context, private val cameraManager: CameraManager, private val callback: CameraSessionCallback) :
   CameraManager.AvailabilityCallback(),
@@ -262,7 +263,7 @@ class CameraSession(private val context: Context, private val cameraManager: Cam
     Log.i(TAG, "Destroying Preview Output...")
     // This needs to run synchronously because after this method returns, the Preview Surface is no longer valid,
     // and trying to use it will crash. This might result in a short UI Thread freeze though.
-    runBlocking {
+    launch(Dispatchers.Main) {
       configure { config ->
         config.preview = CameraConfiguration.Output.Disabled.create()
       }
